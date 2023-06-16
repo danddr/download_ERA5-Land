@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-# for bounding box and coordiantes https://boundingbox.klokantech.com/
 
 import cdsapi
 
