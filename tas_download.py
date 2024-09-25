@@ -1,22 +1,24 @@
-#!/usr/bin/env python
+#download 2m temperature from CDS toolbox
+import cdstoolbox as ct
 
+@ct.application(title='Download data')
+@ct.output.download()
 
-import cdsapi
-
-c = cdsapi.Client()
-
-for year in range(2018, 2023):
-
-     for month in range(1, 13):
-
-        c.retrieve(
+def download_application():
+    all_data_daily = []
+    
+    for i in ['2018', '2019', '2020', '2021', '2022', '2023']:
+        data = ct.catalogue.retrieve(
             'reanalysis-era5-land',
             {
-                'product_type': 'reanalysis',
                 'variable': '2m_temperature',
-                'format':"netcdf",
-                'year': str(year),
-                'month': str(month).zfill(2),
+                'year': [i],
+                'month': [
+                    '01', '02', '03',
+                    '04', '05', '06',
+                    '07', '08', '09',
+                    '10', '11', '12',
+                ],
                 'day': [
                     '01', '02', '03',
                     '04', '05', '06',
@@ -41,9 +43,13 @@ for year in range(2018, 2023):
                     '21:00', '22:00', '23:00',
                 ],
                 'area': [
-                   -20, -77, -58, #ymax, xmin,  ymin, xmax
-                -51,
+                    49, 1, 40, 20,  # ymax, xmin, ymin, xmax
                 ],
-       
-            },
-            'tas_era5Land_'+str(year)+'_'+str(month).zfill(2)+'.nc')
+            }
+        )
+
+        data_daily = ct.climate.daily_mean(data, keep_attrs=True)
+        all_data_daily.append(data_daily)
+    
+    # Combine all the daily data if needed, otherwise return the list
+    return all_data_daily
